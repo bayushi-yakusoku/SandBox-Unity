@@ -86,3 +86,15 @@ InitCodeMarker
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+# Try to avoid package from asset store:
+Packages/*
+Assets/Samples/*
+Assets/Samples.meta
+Assets/External/*
+Assets/External.meta
+
+# ALINE tool:
+Assets/Settings/*
+Assets/Settings.meta
+*ALINE*
