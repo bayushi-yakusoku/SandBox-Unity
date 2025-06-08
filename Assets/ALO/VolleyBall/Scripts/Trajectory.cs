@@ -1,3 +1,4 @@
+using Drawing;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -174,6 +175,7 @@ public class Trajectory {
 
         foreach (Vector3 nextDot in ListDots) {
             Debug.DrawLine(previousDot, nextDot);
+            Draw.ingame.Line(previousDot, nextDot, Color.yellow);
 
             previousDot = nextDot;
         }

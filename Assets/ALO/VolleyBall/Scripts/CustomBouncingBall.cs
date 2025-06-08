@@ -6,6 +6,14 @@ public class CustomBouncingBall : MonoBehaviour , IListener {
 
     [SerializeField] private Transform Ball; // Reference to the ball Ball
 
+    [Space]
+    [SerializeField] private GameObject StartObject;
+    [SerializeField] private GameObject FinishObject;
+
+    [Space]
+    [SerializeField] private int nbDots = 30; // Number of dots to draw in the trajectory
+    [SerializeField] private float trajectoryHight = 6f; // Hight of the trajectory arc
+
     float gravity = 9.8f; // Gravity force
     float bounceForce = 0.5f; // Bounce force multiplier
     float initialVerticalVelocity = 10f; // Initial upward velocity
@@ -31,6 +39,34 @@ public class CustomBouncingBall : MonoBehaviour , IListener {
     }
 
     void Update() {
+
+        // Draw the trajectory line
+        DrawTrajectory();
+
+        // Update the ball position and velocity
+        UpdateBall();
+    }
+
+    void Bounce(Vector3 collisionNormal) {
+        // Reflect the velocity off the plane normal
+        velocity = Vector3.Reflect(velocity, collisionNormal) * bounceForce;
+
+        // Optionally, reduce horizontal velocity on bounce to simulate friction
+        Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
+        velocity = horizontalVelocity * 0.9f + Vector3.up * velocity.y;
+    }
+
+    void IListener.OnCollisionEnter(Collision collision) {
+        Debug.Log(this + "reacting to Collision via IListener");
+
+        // Debug add current contact point and normal
+        collisionPoints.Add((collision.contacts[0].point, collision.contacts[0].normal));
+
+        // Bounce on the first object:
+        Bounce(collision.contacts[0].normal);
+    }
+
+    void UpdateBall() {
         // Apply gravity
         velocity.y -= gravity * Time.deltaTime;
 
@@ -55,22 +91,12 @@ public class CustomBouncingBall : MonoBehaviour , IListener {
 
     }
 
-    void Bounce(Vector3 collisionNormal) {
-        // Reflect the velocity off the plane normal
-        velocity = Vector3.Reflect(velocity, collisionNormal) * bounceForce;
+    void DrawTrajectory() {
+        // Draw the trajectory of the ball
+        Vector3 start = StartObject.transform.position;
+        Vector3 end = FinishObject.transform.position;
 
-        // Optionally, reduce horizontal velocity on bounce to simulate friction
-        Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
-        velocity = horizontalVelocity * 0.9f + Vector3.up * velocity.y;
-    }
-
-    void IListener.OnCollisionEnter(Collision collision) {
-        Debug.Log(this + "reacting to Collision via IListener");
-
-        // Debug add current contact point and normal
-        collisionPoints.Add((collision.contacts[0].point, collision.contacts[0].normal));
-
-        // Bounce on the first object:
-        Bounce(collision.contacts[0].normal);
+        Trajectory trajectory = new Trajectory(start, end, high : trajectoryHight, nbDots : nbDots);
+        trajectory.DrawTrajectory();
     }
 }
